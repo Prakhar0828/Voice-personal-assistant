@@ -10,6 +10,10 @@ import {
   labelForBucket,
   parseActionItemsFromApi,
 } from "@/lib/call-history";
+import {
+  fallbackAccomplishmentsFromMessages,
+  fallbackActionItemsFromMessages,
+} from "@/lib/summary-fallback";
 
 type TranscriptLine = { role: string; text: string };
 
@@ -34,15 +38,8 @@ function getConfigError(): string | null {
 
 function deriveSummaryLocal(lines: TranscriptLine[]): CallSummary {
   return {
-    actionItems: lines
-      .filter((l) => l.role === "user")
-      .map((l) => l.text.trim())
-      .filter(Boolean)
-      .map((text) => ({ text, bucket: "general" })),
-    accomplishments: lines
-      .filter((l) => l.role === "assistant")
-      .map((l) => l.text.trim())
-      .filter(Boolean),
+    actionItems: fallbackActionItemsFromMessages(lines),
+    accomplishments: fallbackAccomplishmentsFromMessages(lines),
   };
 }
 
@@ -341,11 +338,11 @@ export function VoiceAssistant() {
   }
 
   const iconBtnBase =
-    "inline-flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center rounded-full transition-transform duration-200 ease-out hover:scale-[1.12] active:scale-95 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400";
+    "inline-flex h-16 w-16 shrink-0 cursor-pointer items-center justify-center rounded-full transition-transform duration-200 ease-out hover:scale-[1.1] active:scale-95 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 sm:h-[4.25rem] sm:w-[4.25rem]";
 
   return (
-    <div className="flex w-full max-w-3xl flex-col gap-10">
-      <div className="relative mx-auto w-full max-w-xl overflow-hidden rounded-3xl border border-white/10 bg-zinc-950/90 p-8 pb-10 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_25px_80px_-20px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:p-10">
+    <div className="flex w-full max-w-4xl flex-col gap-10">
+      <div className="relative mx-auto w-full max-w-2xl overflow-hidden rounded-3xl border border-white/10 bg-zinc-950/90 p-10 pb-12 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_25px_80px_-20px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:max-w-3xl sm:p-12 sm:pb-14">
         <div
           className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-violet-600/20 blur-3xl"
           aria-hidden
@@ -360,16 +357,16 @@ export function VoiceAssistant() {
           assistantVolume={assistantVolume}
         />
 
-        <div className="relative mt-8 text-center">
-          <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+        <div className="relative mt-10 text-center">
+          <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-4xl">
             {headline}
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-pretty text-sm italic leading-relaxed text-zinc-400 sm:text-base">
+          <p className="mx-auto mt-4 max-w-xl text-pretty text-sm italic leading-relaxed text-zinc-400 sm:text-base md:text-lg">
             {subline}
           </p>
         </div>
 
-        <div className="relative mt-10 flex flex-wrap items-center justify-center gap-4">
+        <div className="relative mt-12 flex flex-wrap items-center justify-center gap-5 sm:gap-6">
           <button
             type="button"
             onClick={startCall}
@@ -381,7 +378,7 @@ export function VoiceAssistant() {
               background: "linear-gradient(135deg, #06b6d4, #8b5cf6)",
             }}
           >
-            <PhoneCall className="h-6 w-6" strokeWidth={1.75} />
+            <PhoneCall className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.75} />
           </button>
           <button
             type="button"
@@ -391,7 +388,7 @@ export function VoiceAssistant() {
             aria-label="End call"
             className={`${iconBtnBase} border border-red-400/40 bg-red-500/15 text-red-200 hover:bg-red-500/25 disabled:opacity-35`}
           >
-            <PhoneOff className="h-6 w-6" strokeWidth={1.75} />
+            <PhoneOff className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.75} />
           </button>
           <button
             type="button"
@@ -402,9 +399,9 @@ export function VoiceAssistant() {
             className={`${iconBtnBase} border border-white/15 bg-white/5 text-zinc-100 hover:bg-white/10 disabled:opacity-35`}
           >
             {muted ? (
-              <MicOff className="h-6 w-6" strokeWidth={1.75} />
+              <MicOff className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.75} />
             ) : (
-              <Mic className="h-6 w-6" strokeWidth={1.75} />
+              <Mic className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.75} />
             )}
           </button>
         </div>

@@ -1,0 +1,50 @@
+# Build Docker image and push to Amazon ECR. After the first push, create or update App Runner
+# (see docs/AWS-DEPLOY.md). Then add repo secret AWS_APP_RUNNER_SERVICE_ARN to auto-redeploy.
+name: Deploy to Amazon ECR
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: voice-personal-assistant
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || env.AWS_REGION }}
+
+      - id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+
+      - name: Trigger App Runner deployment
+        env:
+          SERVICE_ARN: ${{ secrets.AWS_APP_RUNNER_SERVICE_ARN }}
+          DEPLOY_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          if [ -n "$SERVICE_ARN" ]; then
+            aws apprunner start-deployment --service-arn "$SERVICE_ARN" --region "${DEPLOY_REGION:-us-east-1}"
+          else
+            echo "Skipping App Runner: set secret AWS_APP_RUNNER_SERVICE_ARN to enable."
+          fi

@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: App Runner service (requires image voice-personal-assistant:latest in ECR first)
+
+Parameters:
+  ImageUri:
+    Type: String
+    Description: Full ECR image URI including tag (e.g. 123456789.dkr.ecr.us-east-1.amazonaws.com/voice-personal-assistant:latest)
+
+Resources:
+  AppRunnerAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: build.apprunner.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSAppRunnerServicePolicyForECRAccess
+
+  VoiceService:
+    Type: AWS::AppRunner::Service
+    Properties:
+      ServiceName: voice-personal-assistant
+      SourceConfiguration:
+        AuthenticationConfiguration:
+          AccessRoleArn: !GetAtt AppRunnerAccessRole.Arn
+        AutoDeploymentsEnabled: true
+        ImageRepository:
+          ImageIdentifier: !Ref ImageUri
+          ImageRepositoryType: ECR
+          ImageConfiguration:
+            Port: "3000"
+            RuntimeEnvironmentVariables:
+              - Name: NODE_ENV
+                Value: production
+      InstanceConfiguration:
+        Cpu: 1024
+        Memory: 2048
+      HealthCheckConfiguration:
+        Protocol: HTTP
+        Path: /
+        Interval: 15
+        Timeout: 5
+        HealthyThreshold: 1
+        UnhealthyThreshold: 5
+
+Outputs:
+  ServiceUrl:
+    Description: Public HTTPS URL
+    Value: !GetAtt VoiceService.ServiceUrl
+  ServiceArn:
+    Value: !GetAtt VoiceService.ServiceArn

@@ -53,6 +53,14 @@ Summaries use **`gpt-4o`** by default (via the Chat Completions API). Override w
 
 Older calls stay on the page as separate cards (newest first). Without `OPENAI_API_KEY`, the API falls back to listing final lines by speaker.
 
+## Deploy to AWS
+
+This repo is set up for **AWS Amplify Hosting** (`amplify.yml`) and for **Docker → ECR → App Runner** (`Dockerfile`, `infrastructure/*.yaml`, GitHub Action).
+
+Your IAM user needs the right permissions (ECR, CloudFormation, App Runner, etc.). If `aws ecr` or CloudFormation returns **AccessDenied**, ask an admin to extend your policy.
+
+Step-by-step options, IAM examples, and GitHub Action secrets: **[docs/AWS-DEPLOY.md](docs/AWS-DEPLOY.md)**.
+
 ## Scripts
 
 - `npm run dev` — development server (Turbopack)

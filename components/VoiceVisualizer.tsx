@@ -78,8 +78,8 @@ export function VoiceVisualizer({
   }, [phase, assistantVolume]);
 
   return (
-    <div className="relative flex w-full max-w-md items-center justify-center px-1 sm:max-w-lg" aria-hidden>
-      <div className="relative z-10 flex h-36 items-end gap-1 sm:h-40">
+    <div className="relative flex w-full max-w-lg items-center justify-center px-1 sm:max-w-xl" aria-hidden>
+      <div className="relative z-10 flex h-40 items-end gap-1 sm:h-44">
         {levels.map((lv, i) => {
           const scale = barHeightScale(i);
           const opacity = Math.min(1, 0.38 + scale * 0.58);
