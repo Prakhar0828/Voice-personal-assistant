@@ -29,3 +29,54 @@ body {
 .voice-visualizer-bar {
   transition: height 0.22s ease-out;
 }
+
+@keyframes flow-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.flow-node-shimmer {
+  animation: flow-shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes flow-active-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px -6px rgba(34, 211, 238, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 28px -4px rgba(34, 211, 238, 0.55);
+  }
+}
+
+.flow-node-active {
+  animation: flow-active-glow 2.2s ease-in-out infinite;
+}
+
+.flow-active-ping {
+  animation: flow-ping-soft 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes flow-ping-soft {
+  75%,
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-node-shimmer,
+  .flow-node-active,
+  .flow-active-ping {
+    animation: none;
+  }
+
+  .flow-node-active {
+    box-shadow: 0 0 20px -6px rgba(34, 211, 238, 0.35);
+  }
+}

@@ -2,8 +2,11 @@
 
 import Vapi from "@vapi-ai/web";
 import { Mic, MicOff, PhoneCall, PhoneOff } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { LiveTaskFlowChart } from "@/components/LiveTaskFlowChart";
+import { useLiveTaskPipeline } from "@/components/useLiveTaskPipeline";
 import { VoiceVisualizer } from "@/components/VoiceVisualizer";
+import { inferOrderedBuckets } from "@/lib/live-task-pipeline";
 import {
   appendStoredCall,
   type CallSummary,
@@ -155,6 +158,21 @@ export function VoiceAssistant() {
   const [lastError, setLastError] = useState<string | null>(null);
   const [assistantVolume, setAssistantVolume] = useState(0);
   const [summaryCards, setSummaryCards] = useState<SummaryCardRecord[]>([]);
+  const [liveUserLines, setLiveUserLines] = useState<string[]>([]);
+  const [liveTranscriptLines, setLiveTranscriptLines] = useState<
+    TranscriptLine[]
+  >([]);
+
+  const orderedBuckets = useMemo(
+    () => inferOrderedBuckets(liveUserLines),
+    [liveUserLines],
+  );
+
+  const { steps: livePipelineSteps } = useLiveTaskPipeline(
+    connected,
+    orderedBuckets,
+    liveTranscriptLines,
+  );
 
   useEffect(() => {
     if (configError) return;
@@ -164,6 +182,9 @@ export function VoiceAssistant() {
     vapiRef.current = vapi;
 
     const onCallStart = () => {
+      transcriptRef.current = [];
+      setLiveUserLines([]);
+      setLiveTranscriptLines([]);
       setConnected(true);
       setLastError(null);
     };
@@ -232,10 +253,12 @@ export function VoiceAssistant() {
     };
 
     const onCallEnd = () => {
+      const lines = [...transcriptRef.current];
       setConnected(false);
       setAssistantSpeaking(false);
       setAssistantVolume(0);
-      const lines = [...transcriptRef.current];
+      setLiveUserLines([]);
+      setLiveTranscriptLines([]);
       runSummary(lines);
     };
 
@@ -251,6 +274,12 @@ export function VoiceAssistant() {
             : "unknown";
         const line: TranscriptLine = { role, text: message.transcript as string };
         transcriptRef.current = [...transcriptRef.current, line];
+        if (role === "user" || role === "assistant") {
+          setLiveTranscriptLines((prev) => [...prev, line]);
+        }
+        if (role === "user") {
+          setLiveUserLines((prev) => [...prev, line.text]);
+        }
       }
     };
     const onError = (err: unknown) => {
@@ -293,6 +322,8 @@ export function VoiceAssistant() {
     if (configError || !vapiRef.current) return;
     setLastError(null);
     transcriptRef.current = [];
+    setLiveUserLines([]);
+    setLiveTranscriptLines([]);
     setMuted(false);
     const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID!.trim();
     await vapiRef.current.start(assistantId);
@@ -406,6 +437,12 @@ export function VoiceAssistant() {
           </button>
         </div>
       </div>
+
+      {connected ? (
+        <div className="mx-auto w-full max-w-2xl sm:max-w-3xl">
+          <LiveTaskFlowChart steps={livePipelineSteps} />
+        </div>
+      ) : null}
 
       {lastError && (
         <div className="rounded-2xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-sm text-red-100 backdrop-blur-sm">
