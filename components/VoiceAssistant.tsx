@@ -2,7 +2,6 @@
 
 import Vapi from "@vapi-ai/web";
 import { Mic, MicOff, PhoneCall, PhoneOff } from "lucide-react";
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { VoiceVisualizer } from "@/components/VoiceVisualizer";
 import {
@@ -22,7 +21,7 @@ type SummaryCardRecord = {
 };
 
 const HINT =
-  "“Aether, summarize my pending neural connections.”";
+  "“Jarvis, summarize my pending neural connections.”";
 
 function getConfigError(): string | null {
   const key = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY?.trim();
@@ -321,7 +320,7 @@ export function VoiceAssistant() {
       : "listening";
 
   const headline = !connected
-    ? "Ready when you are"
+    ? "Making you 10x productive every day."
     : assistantSpeaking
       ? "Assistant is speaking…"
       : "Listening for command…";
@@ -346,15 +345,6 @@ export function VoiceAssistant() {
 
   return (
     <div className="flex w-full max-w-3xl flex-col gap-10">
-      <div className="flex justify-end">
-        <Link
-          href="/dashboard"
-          className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 transition hover:text-cyan-400/90"
-        >
-          Activity dashboard →
-        </Link>
-      </div>
-
       <div className="relative mx-auto w-full max-w-xl overflow-hidden rounded-3xl border border-white/10 bg-zinc-950/90 p-8 pb-10 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_25px_80px_-20px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:p-10">
         <div
           className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-violet-600/20 blur-3xl"

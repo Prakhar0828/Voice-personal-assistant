@@ -8,14 +8,11 @@ export default function Home() {
         aria-hidden
       />
       <main className="relative z-10 w-full max-w-4xl px-2 sm:px-0">
-        <p className="text-center text-[10px] font-semibold uppercase tracking-[0.35em] text-zinc-500">
-          Voice
-        </p>
-        <h1 className="mt-2 text-center text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-          Personal assistant
+        <h1 className="text-center text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          {"Prakhar's personal assistant"}
         </h1>
-        <p className="mx-auto mt-3 max-w-md text-center text-pretty text-sm text-zinc-400">
-          Speak naturally. Your Vapi assistant handles the rest.
+        <p className="mx-auto mt-4 max-w-lg text-center text-pretty text-base text-zinc-400 sm:text-lg">
+          Get all your tasks done with your super voice assistant.
         </p>
         <div className="mt-12 flex justify-center">
           <VoiceAssistant />

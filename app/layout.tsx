@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { AppShell } from "@/components/AppShell";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,8 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Voice personal assistant",
-  description: "Browser voice UI for your Vapi assistant",
+  title: "Prakhar's personal assistant",
+  description:
+    "Get all your tasks done with your super voice assistant.",
 };
 
 export default function RootLayout({
@@ -28,7 +30,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-[#070708] text-zinc-100">
-        {children}
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

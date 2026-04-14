@@ -24,3 +24,8 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
+
+/* Voice bars — from reference-code.html */
+.voice-visualizer-bar {
+  transition: height 0.22s ease-out;
+}
